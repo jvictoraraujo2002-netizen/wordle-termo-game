@@ -1,45 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wordle — PT-BR (Moderno)</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <h1 class="logo">Wordle</h1>
-      <div class="controls">
-        <label for="wordLength">Letras:</label>
-        <select id="wordLength" aria-label="Escolher número de letras">
+  <main class="container">
+    <header class="topo">
+      <h1>Wordle</h1>
+      <div class="opcoes">
+        <label for="tamanho">Letras:</label>
+        <select id="tamanho">
           <option value="4">4</option>
           <option value="5" selected>5</option>
           <option value="6">6</option>
           <option value="7">7</option>
           <option value="8">8</option>
         </select>
-        <button id="newGameBtn" class="btn">Novo jogo</button>
+        <button id="novoJogo" class="btn-grad">Novo jogo</button>
       </div>
     </header>
 
-    <section class="game-area">
-      <div id="message" role="status" aria-live="polite" class="message">Escolha o número de letras e clique em Novo jogo para começar.</div>
+    <section id="tabuleiro" class="tabuleiro"></section>
 
-      <div id="board" class="board" aria-hidden="true"></div>
+    <div class="entrada">
+      <input type="text" id="entradaPalavra" placeholder="Digite sua palavra" maxlength="8" autocomplete="off">
+      <button id="enviar" class="btn-grad">Enviar</button>
+      <button id="apagar">Apagar</button>
+    </div>
 
-      <div id="controlsRow" class="controls-row">
-        <input id="guessInput" type="text" inputmode="latin" autocomplete="off" autocapitalize="off" maxlength="8" placeholder="Digite sua palavra" />
-        <button id="submitBtn" class="btn">Enviar</button>
-        <button id="delBtn" class="btn secondary">Apagar</button>
-      </div>
+    <p id="mensagem" class="mensagem"></p>
 
-      <div class="keyboard" id="keyboard" aria-hidden="true"></div>
-    </section>
-
-    <footer class="footer">
-      <small>6 tentativas — palavras em <strong>Português (pt-BR)</strong>. Clique em <em>Novo jogo</em> para reiniciar.</small>
-      <small>Lista de palavras de exemplo embutida — você pode expandir em <code>script.js</code>.</small>
+    <footer class="rodape">
+      <p>6 tentativas — palavras em <b>Português (pt-BR)</b>. Clique em <b>Novo jogo</b> para reiniciar.</p>
     </footer>
   </main>
 
