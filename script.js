@@ -1,116 +1,111 @@
-const tabuleiro = document.getElementById('tabuleiro');
-const inputPalavra = document.getElementById('entradaPalavra');
-const btnEnviar = document.getElementById('enviar');
-const btnApagar = document.getElementById('apagar');
-const btnNovoJogo = document.getElementById('novoJogo');
-const selectTamanho = document.getElementById('tamanho');
-const mensagem = document.getElementById('mensagem');
+let palavraSecreta = "";
+let tamanho = 5;
+let tentativas = 6;
+let tentativaAtual = 0;
+let listaPalavras = [];
+let jogoAtivo = true;
 
-let palavraSecreta = '';
-let tamanhoPalavra = parseInt(selectTamanho.value);
-let maxTentativas = 6;
-let tentativas = 0;
-
-const palavras = {
-  4: ['CASA', 'DADO', 'GATO', 'BOLA', 'RATO', 'VIDA'],
-  5: ['PIANO', 'AMORA', 'CASAL', 'LIVRO', 'PRAIA', 'TORRE'],
-  6: ['CARROS', 'FLORES', 'SENHOR', 'CAMERA', 'TIGRES'],
-  7: ['AMARELO', 'BRAVURA', 'ESTRADA', 'MENSURA', 'CANTORA'],
-  8: ['ANIMALES', 'FANTASIA', 'CADERNOS', 'ABSTRATO', 'MONTANHA']
-};
-
-function escolherPalavra() {
-  const lista = palavras[tamanhoPalavra];
-  const indice = Math.floor(Math.random() * lista.length);
-  palavraSecreta = lista[indice].toUpperCase();
+async function carregarPalavras() {
+  try {
+    const resposta = await fetch("palavras.json");
+    listaPalavras = await resposta.json();
+  } catch (erro) {
+    console.error("Erro ao carregar palavras.json:", erro);
+    listaPalavras = ["AMORA", "CASAS", "LIVRO", "FLORE", "TEMPO"];
+  }
 }
 
-function criarTabuleiro() {
-  tabuleiro.innerHTML = '';
-  for (let i = 0; i < maxTentativas; i++) {
-    const linha = document.createElement('div');
-    linha.classList.add('linha');
-    for (let j = 0; j < tamanhoPalavra; j++) {
-      const letra = document.createElement('div');
-      letra.classList.add('letra');
-      linha.appendChild(letra);
+async function iniciarJogo() {
+  await carregarPalavras();
+  tamanho = parseInt(document.getElementById("tamanho").value);
+  palavraSecreta = gerarPalavraAleatoria(tamanho).toUpperCase();
+  tentativaAtual = 0;
+  jogoAtivo = true;
+
+  const tabuleiro = document.getElementById("tabuleiro");
+  tabuleiro.innerHTML = "";
+  document.getElementById("mensagem").textContent = "";
+
+  for (let i = 0; i < tentativas; i++) {
+    const linha = document.createElement("div");
+    linha.classList.add("linha");
+    for (let j = 0; j < tamanho; j++) {
+      const celula = document.createElement("div");
+      celula.classList.add("celula");
+      linha.appendChild(celula);
     }
     tabuleiro.appendChild(linha);
   }
 }
 
-function novoJogo() {
-  tentativas = 0;
-  tamanhoPalavra = parseInt(selectTamanho.value);
-  escolherPalavra();
-  criarTabuleiro();
-  mensagem.textContent = '';
-  inputPalavra.value = '';
-  inputPalavra.disabled = false;
-  inputPalavra.maxLength = tamanhoPalavra;
+function gerarPalavraAleatoria(tam) {
+  const palavrasFiltradas = listaPalavras.filter(p => p.length === tam);
+  return palavrasFiltradas[Math.floor(Math.random() * palavrasFiltradas.length)];
 }
 
 function verificarPalavra() {
-  const tentativa = inputPalavra.value.trim().toUpperCase();
-  if (tentativa.length !== tamanhoPalavra) {
-    mensagem.textContent = `A palavra deve ter ${tamanhoPalavra} letras.`;
+  if (!jogoAtivo) return;
+
+  const entrada = document.getElementById("entradaPalavra");
+  const palavra = entrada.value.toUpperCase().trim();
+  const mensagem = document.getElementById("mensagem");
+
+  if (palavra.length !== tamanho) {
+    mensagem.textContent = `A palavra deve ter ${tamanho} letras.`;
     return;
   }
 
-  const palavraArray = palavraSecreta.split('');
-  const tentativaArray = tentativa.split('');
-  const linhaAtual = document.querySelectorAll(`.linha:nth-child(${tentativas + 1}) .letra`);
+  const linha = document.querySelectorAll(".linha")[tentativaAtual];
+  const letras = linha.querySelectorAll(".celula");
 
-  // Primeira passada: verificar acertos exatos (verde)
-  const letrasRestantes = {};
-  for (let i = 0; i < tamanhoPalavra; i++) {
-    if (tentativaArray[i] === palavraArray[i]) {
-      linhaAtual[i].textContent = tentativaArray[i];
-      linhaAtual[i].classList.add('correto'); // verde
-      palavraArray[i] = null; // marca como usada
-    } else {
-      const letra = palavraArray[i];
-      if (letra) letrasRestantes[letra] = (letrasRestantes[letra] || 0) + 1;
+  // Primeira verificação: letras corretas (verde)
+  const palavraArray = palavraSecreta.split("");
+  const resultado = Array(tamanho).fill("");
+
+  for (let i = 0; i < tamanho; i++) {
+    letras[i].textContent = palavra[i];
+    if (palavra[i] === palavraArray[i]) {
+      resultado[i] = "correto";
+      palavraArray[i] = null;
     }
   }
 
-  // Segunda passada: verificar letras corretas mas em posição errada (amarelo)
-  for (let i = 0; i < tamanhoPalavra; i++) {
-    if (!linhaAtual[i].textContent) linhaAtual[i].textContent = tentativaArray[i];
-    if (!linhaAtual[i].classList.contains('correto')) {
-      const letra = tentativaArray[i];
-      if (letrasRestantes[letra] && letrasRestantes[letra] > 0) {
-        linhaAtual[i].classList.add('parcial'); // amarelo
-        letrasRestantes[letra]--;
+  // Segunda verificação: letras na palavra, mas posição errada (amarelo)
+  for (let i = 0; i < tamanho; i++) {
+    if (resultado[i] === "") {
+      const index = palavraArray.indexOf(palavra[i]);
+      if (index !== -1) {
+        resultado[i] = "existe";
+        palavraArray[index] = null;
       } else {
-        linhaAtual[i].classList.add('incorreto'); // cinza
+        resultado[i] = "errado";
       }
     }
   }
 
-  tentativas++;
-
-  if (tentativa === palavraSecreta) {
-    mensagem.textContent = `🎉 Parabéns! Você acertou a palavra "${palavraSecreta}".`;
-    inputPalavra.disabled = true;
-  } else if (tentativas >= maxTentativas) {
-    mensagem.textContent = `😢 Fim de jogo! A palavra era "${palavraSecreta}".`;
-    inputPalavra.disabled = true;
-  } else {
-    mensagem.textContent = '';
+  // Aplicar cores
+  for (let i = 0; i < tamanho; i++) {
+    letras[i].classList.remove("correto", "existe", "errado");
+    letras[i].classList.add(resultado[i]);
   }
 
-  inputPalavra.value = '';
+  tentativaAtual++;
+
+  if (resultado.every(r => r === "correto")) {
+    mensagem.innerHTML = "🎉 <b>Parabéns! Você acertou!</b>";
+    jogoAtivo = false;
+  } else if (tentativaAtual >= tentativas) {
+    mensagem.innerHTML = `❌ Fim de jogo! A palavra era <b>${palavraSecreta}</b>.`;
+    jogoAtivo = false;
+  }
+
+  entrada.value = "";
 }
 
-btnEnviar.addEventListener('click', verificarPalavra);
-btnApagar.addEventListener('click', () => inputPalavra.value = '');
-btnNovoJogo.addEventListener('click', novoJogo);
-selectTamanho.addEventListener('change', novoJogo);
-
-// Permitir Enter para enviar
-inputPalavra.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') verificarPalavra();
+document.getElementById("enviar").addEventListener("click", verificarPalavra);
+document.getElementById("apagar").addEventListener("click", () => {
+  document.getElementById("entradaPalavra").value = "";
 });
-
-novoJogo();
+document.getElementById("novoJogo").addEventListener("click", iniciarJogo);
+document.getElementById("tamanho").addEventListener("change", iniciarJogo);
+window.addEventListener("load", iniciarJogo);
