@@ -16,11 +16,17 @@ async function carregarPalavras() {
 }
 
 async function iniciarJogo() {
-  await carregarPalavras();
+  // Aguarda o carregamento das palavras antes de criar o tabuleiro
+  if (listaPalavras.length === 0) {
+    await carregarPalavras();
+  }
+
   tamanho = parseInt(document.getElementById("tamanho").value);
   palavraSecreta = gerarPalavraAleatoria(tamanho).toUpperCase();
   tentativaAtual = 0;
   jogoAtivo = true;
+
+  console.log("Palavra secreta:", palavraSecreta); // útil para teste
 
   const tabuleiro = document.getElementById("tabuleiro");
   tabuleiro.innerHTML = "";
@@ -40,6 +46,9 @@ async function iniciarJogo() {
 
 function gerarPalavraAleatoria(tam) {
   const palavrasFiltradas = listaPalavras.filter(p => p.length === tam);
+  if (palavrasFiltradas.length === 0) {
+    return "TESTE"; // fallback
+  }
   return palavrasFiltradas[Math.floor(Math.random() * palavrasFiltradas.length)];
 }
 
@@ -58,10 +67,10 @@ function verificarPalavra() {
   const linha = document.querySelectorAll(".linha")[tentativaAtual];
   const letras = linha.querySelectorAll(".celula");
 
-  // Primeira verificação: letras corretas (verde)
   const palavraArray = palavraSecreta.split("");
   const resultado = Array(tamanho).fill("");
 
+  // Primeira verificação: letras corretas (verde)
   for (let i = 0; i < tamanho; i++) {
     letras[i].textContent = palavra[i];
     if (palavra[i] === palavraArray[i]) {
@@ -70,7 +79,7 @@ function verificarPalavra() {
     }
   }
 
-  // Segunda verificação: letras na palavra, mas posição errada (amarelo)
+  // Segunda verificação: letras existentes (amarelo)
   for (let i = 0; i < tamanho; i++) {
     if (resultado[i] === "") {
       const index = palavraArray.indexOf(palavra[i]);
@@ -108,4 +117,6 @@ document.getElementById("apagar").addEventListener("click", () => {
 });
 document.getElementById("novoJogo").addEventListener("click", iniciarJogo);
 document.getElementById("tamanho").addEventListener("change", iniciarJogo);
-window.addEventListener("load", iniciarJogo);
+
+// Espera o DOM carregar antes de iniciar o jogo
+window.addEventListener("DOMContentLoaded", iniciarJogo);
