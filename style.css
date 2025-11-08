@@ -1,205 +1,124 @@
-:root{
-  --bg:#0b0f14;
-  --panel:#0f1620;
-  --muted:#9aa6b2;
-  --accent1:#8a6dff; /* roxo */
-  --accent2:#2be7d1; /* ciano suave */
-  --good:#24c281;    /* acerto exato */
-  --present:#e3b84b; /* existe na palavra */
-  --bad:#2b3440;     /* ausente */
-  --glass: rgba(255,255,255,0.03);
-  --radius:12px;
-  --glass-2: rgba(255,255,255,0.02);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+/* ====== FONTES E BASE ====== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    background: radial-gradient(circle at top, #0f141a 0%, #0b0e12 100%);
+    color: #e0e6ed;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    transition: background 0.3s ease;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  background: linear-gradient(180deg,var(--bg), #071018 80%);
-  color:#e6eef6;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:28px;
+/* ====== TÍTULO ====== */
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
 }
 
-/* App container */
-.app{
-  width:100%;
-  max-width:920px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius:16px;
-  padding:20px;
-  box-shadow: 0 8px 30px rgba(2,4,8,0.7);
-  border: 1px solid rgba(255,255,255,0.03);
+/* ====== CONTROLES ====== */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-/* Topbar */
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:18px;
-}
-.logo{
-  margin:0;
-  font-size:1.6rem;
-  letter-spacing:0.6px;
-  color:linear-gradient(90deg,var(--accent1),var(--accent2));
-}
-.controls{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-label{font-size:0.9rem;color:var(--muted)}
-select{
-  padding:6px 8px;
-  background:var(--glass-2);
-  border:1px solid rgba(255,255,255,0.04);
-  color:inherit;
-  border-radius:8px;
-  outline:none;
+select, input, button {
+    background: #1a1f25;
+    color: #e0e6ed;
+    border: 1px solid #2a2f36;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-/* Buttons */
-.btn{
-  background: linear-gradient(90deg,var(--accent1),var(--accent2));
-  color:#061016;
-  border:none;
-  padding:8px 12px;
-  border-radius:10px;
-  font-weight:600;
-  cursor:pointer;
-  box-shadow: 0 6px 18px rgba(138,109,255,0.12);
-}
-.btn.secondary{
-  background:transparent;
-  border:1px solid rgba(255,255,255,0.04);
-  color:var(--muted);
-  box-shadow:none;
+select:focus, input:focus, button:hover {
+    border-color: #00c853;
+    box-shadow: 0 0 6px rgba(0, 200, 83, 0.4);
 }
 
-/* Message */
-.message{
-  background:var(--panel);
-  padding:12px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.02);
-  color:var(--muted);
-  margin-bottom:14px;
-  font-size:0.95rem;
+/* ====== TABULEIRO ====== */
+#board {
+    display: grid;
+    gap: 6px;
+    margin-top: 20px;
+    justify-content: center;
 }
 
-/* Board grid */
-.board{
-  display:grid;
-  gap:8px;
-  justify-content:center;
-  margin-bottom:12px;
-  padding:10px;
+/* Cada linha terá o número de letras dinâmico (ajustado via JS) */
+.row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
 }
 
-/* Row & cell */
-.row{
-  display:flex;
-  gap:8px;
-  justify-content:center;
-}
-.cell{
-  width:56px;
-  height:66px;
-  border-radius:8px;
-  background:linear-gradient(180deg,var(--glass),rgba(255,255,255,0.01));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  font-size:1.3rem;
-  letter-spacing:2px;
-  color:var(--muted);
-  border:1px solid rgba(255,255,255,0.03);
-  transition:transform .12s ease, background .18s ease, color .12s linear;
-  text-transform:uppercase;
-}
-.cell.filled{color:#e6eef6}
-.cell.flip{
-  transform:rotateX(90deg);
+.tile {
+    width: 60px;
+    height: 60px;
+    background: #1c232a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 2px solid #2a2f36;
+    transition: background 0.3s, transform 0.2s ease;
 }
 
-/* State colors */
-.cell.correct{
-  background:linear-gradient(90deg,var(--good), #16a76b);
-  color:#081710;
-  border: none;
-}
-.cell.present{
-  background:linear-gradient(90deg,var(--present), #d69d2f);
-  color:#071205;
-  border: none;
-}
-.cell.absent{
-  background:linear-gradient(90deg,var(--bad), #1b222b);
-  color:var(--muted);
-  border: none;
+/* Animação leve ao preencher */
+.tile.filled {
+    transform: scale(1.1);
 }
 
-/* Controls row */
-.controls-row{
-  display:flex;
-  gap:8px;
-  margin-top:8px;
-  align-items:center;
-}
-#guessInput{
-  flex:1;
-  padding:10px 12px;
-  border-radius:10px;
-  background:transparent;
-  border:1px solid rgba(255,255,255,0.04);
-  color:inherit;
-  outline:none;
-  font-size:1rem;
+/* ====== CORES DE FEEDBACK ====== */
+.correct {
+    background: #00c853;
+    border-color: #00c853;
+    color: #fff;
 }
 
-/* Keyboard */
-.keyboard{
-  margin-top:16px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  justify-content:center;
-}
-.key{
-  min-width:38px;
-  padding:8px 10px;
-  border-radius:8px;
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,0.02);
-  text-transform:uppercase;
-  font-weight:600;
-  font-size:0.9rem;
-  cursor:pointer;
+.present {
+    background: #ffeb3b;
+    border-color: #ffeb3b;
+    color: #000;
 }
 
-/* Footer */
-.footer{
-  margin-top:16px;
-  display:flex;
-  gap:12px;
-  justify-content:space-between;
-  color:var(--muted);
-  font-size:0.85rem;
+.absent {
+    background: #37474f;
+    border-color: #37474f;
+    color: #bbb;
 }
 
-/* Responsive */
-@media (max-width:520px){
-  .cell{width:44px;height:54px;font-size:1.1rem}
-  .controls{flex-wrap:wrap}
-  .btn{padding:7px 10px}
+/* ====== MENSAGEM FINAL ====== */
+#message {
+    margin-top: 20px;
+    font-weight: 600;
+    color: #00c853;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 600px) {
+    .tile {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+    }
+    h1 {
+        font-size: 2rem;
+    }
 }
