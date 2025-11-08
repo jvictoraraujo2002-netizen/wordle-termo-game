@@ -4,7 +4,169 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wordle</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ==== RESET & BASE ==== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: radial-gradient(circle at top, #0b0f17 0%, #050709 100%);
+      color: #e5e5e5;
+      font-family: "Inter", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    main.container {
+      background: rgba(20, 24, 33, 0.85);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      padding: 30px 40px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ==== TOPO ==== */
+    .topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .topo h1 {
+      font-size: 2rem;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .opcoes {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .opcoes label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    select {
+      background: #12151e;
+      color: #e5e5e5;
+      border: 1px solid #2e3241;
+      border-radius: 6px;
+      padding: 4px 8px;
+    }
+
+    /* ==== BOTÕES ==== */
+    .btn-grad {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-grad:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(0, 198, 255, 0.5);
+    }
+    #apagar {
+      background: #2e3241;
+      color: #ccc;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #apagar:hover {
+      background: #3c4257;
+    }
+
+    /* ==== TABULEIRO ==== */
+    .tabuleiro {
+      display: grid;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .linha {
+      display: flex;
+      gap: 8px;
+    }
+    .celula {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #2e3241;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      border-radius: 8px;
+      background-color: #12151e;
+      transition: background 0.3s ease, border 0.3s ease, transform 0.2s ease;
+    }
+    .celula.correta {
+      background: #00c853;
+      color: #fff;
+      border-color: #00c853;
+    }
+    .celula.parcial {
+      background: #ffeb3b;
+      color: #333;
+      border-color: #ffeb3b;
+    }
+    .celula.errada {
+      background: #37474f;
+      color: #aaa;
+      border-color: #37474f;
+    }
+
+    /* ==== ENTRADA ==== */
+    .entrada {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    input#entradaPalavra {
+      background: #12151e;
+      border: 1px solid #2e3241;
+      color: #e5e5e5;
+      border-radius: 6px;
+      padding: 8px 12px;
+      width: 50%;
+      text-align: center;
+      font-size: 1rem;
+    }
+    input#entradaPalavra::placeholder {
+      color: #666;
+    }
+
+    /* ==== MENSAGEM ==== */
+    .mensagem {
+      min-height: 22px;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+    }
+
+    /* ==== RODAPÉ ==== */
+    .rodape {
+      font-size: 0.85rem;
+      opacity: 0.75;
+    }
+  </style>
 </head>
 <body>
   <main class="container">
